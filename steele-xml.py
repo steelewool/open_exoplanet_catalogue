@@ -43,6 +43,8 @@ count = 0
 # Set up by grabbing the current date and then using the Time object from astropy.time
 
 dateTime    = datetime.today()
+nowPST      = Time (dateTime, scale='utc')
+
 dateTimeUTC = datetime.utcnow()
 now         = Time (dateTimeUTC, scale='utc')
 
@@ -100,36 +102,45 @@ for file in os.listdir('xml_files'):
                         nextTransitTime = Time (nextTransit, format ='jd', scale = 'utc');
 
                         daysToTransit = nextTransit - now.jd
+
+#
+# Change the time to PST by subtracting 8 hours from the UTC time
+#
                         nextTransitTimePST = nextTransit - (1.0/24.0*8.0)
                         nTTPST = Time (nextTransitTimePST, format='jd', scale='utc')
 
-                        if float(mag) < 14:
+                        a = nextTransitTimePST
+                        b = nowPST.jd + 1
+                        c = a < b
+
+                        if (float(mag) < 11) and (nextTransitTimePST < (nowPST.jd + 1)):
                             count = count + 1
-                            print 'Planet name           : ', planet.findtext('name')
-                            print 'Planet period         : ', planet.findtext('period') 
+                            print 'dateTime              : ', dateTime
+                            print 'dateTimeUTC           : ', dateTimeUTC
+                            print
                             print 'System name           : ', root.findtext('name')
                             print 'System rightascension : ', root.findtext('rightascension')
                             print 'System declination    : ', root.findtext('declination')
                             print 'System magnitude      : ', mag
                             print
-                            print "transitTimeBJD      : ", transitTimeBJD
-                            print 'transittime         : ', planet.findtext('transittime')
-                            print "t.jd                : ", t.jd
-                            print "t.fits              : ", t.fits
-                            print "dateTime            : ", dateTime
-                            print "dateTimeUTC         : ", dateTimeUTC                
-                            print "now                 : ", now
-                            print "now jd              : ", now.jd
-                            print "now fits            : ", now.fits
-                            print "delta               : ", delta
-                            print "revolutionCount     : ", revolutionCount
-                            print "int revoultionCount : ", int(revolutionCount) + 1
-                            print "nextTransit         : ", nextTransit
-                            print "nextTransitTime     : ", nextTransitTime.fits
-                            print "daysToTransit       : ", daysToTransit
-                            print "nextTransitTimePST  : ", nextTransitTimePST
-                            print "nTTPST.jd           : ", nTTPST.jd
-                            print "nTTPST.fits         : ", nTTPST.fits, "PST"
+                            print 'Planet name           : ', planet.findtext('name')
+                            print 'Planet period         : ', planet.findtext('period') 
+                            print
+                            print 'transitTimeBJD        : ', transitTimeBJD
+                            print 't.jd                  : ', t.jd
+                            print 't.fits                : ', t.fits
+                            print 'now                   : ', now
+                            print 'now jd                : ', now.jd
+                            print 'now fits              : ', now.fits
+                            print 'delta                 : ', delta
+                            print 'revolutionCount       : ', revolutionCount
+                            print 'int revoultionCount   : ', int(revolutionCount) + 1
+                            print 'nextTransit           : ', nextTransit
+                            print 'nextTransitTime       : ', nextTransitTime.fits
+                            print 'daysToTransit         : ', daysToTransit
+                            print 'nextTransitTimePST    : ', nextTransitTimePST
+                            print 'nTTPST.jd             : ', nTTPST.jd
+                            print 'nTTPST.fits           : ', nTTPST.fits, 'PST'
 
                             print 'count: ', count
                             print
