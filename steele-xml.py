@@ -1,3 +1,4 @@
+
 import xml.etree.ElementTree as ET
 
 import fnmatch
@@ -47,6 +48,11 @@ nowPST      = Time (dateTime, scale='utc')
 
 dateTimeUTC = datetime.utcnow()
 now         = Time (dateTimeUTC, scale='utc')
+
+# For testing hardcore a date/time range
+
+observingRange = ['2017-12-24T18:00:00','2017-12-25T01:00:00']
+rangeTime = Time(observingRange, format='isot', scale='utc')
 
 for file in os.listdir('xml_files'):
 
@@ -106,6 +112,7 @@ for file in os.listdir('xml_files'):
 #
 # Change the time to PST by subtracting 8 hours from the UTC time
 #
+
                         nextTransitTimePST = nextTransit - (1.0/24.0*8.0)
                         nTTPST = Time (nextTransitTimePST, format='jd', scale='utc')
 
@@ -113,8 +120,18 @@ for file in os.listdir('xml_files'):
                         b = nowPST.jd + 1
                         c = a < b
 
-                        if (float(mag) < 11) and (nextTransitTimePST < (nowPST.jd + 1)):
+                        d = False
+                        if nTTPST > rangeTime[0]:
+#                            print 'nextTransitTime greater than rangeTime[0]'
+                            if nTTPST < rangeTime[1]:
+#                                print 'nextTransitTime less than rangeTime[1]'
+                                d = True;
+#                        print 'd: ', d
+                                    
+
+                        if (float(mag) < 11) and d:
                             count = count + 1
+                            
                             print 'dateTime              : ', dateTime
                             print 'dateTimeUTC           : ', dateTimeUTC
                             print
