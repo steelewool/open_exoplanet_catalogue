@@ -12,6 +12,10 @@ import time
 from datetime import date
 from datetime import datetime
 
+from astropy.coordinates import EarthLocation,SkyCoord
+from astropy import units as u
+from astropy.coordinates import AltAz
+
 # import subprocess
 
 # subprocess.call ('ls')
@@ -51,7 +55,7 @@ now         = Time (dateTimeUTC, scale='utc')
 
 # For testing hardcore a date/time range
 
-observingRange = ['2017-12-24T18:00:00','2017-12-25T01:00:00']
+observingRange = ['2017-12-25T18:00:00','2017-12-25T23:00:00']
 rangeTime = Time(observingRange, format='isot', scale='utc')
 
 for file in os.listdir('xml_files'):
@@ -122,16 +126,21 @@ for file in os.listdir('xml_files'):
 
                         d = False
                         if nTTPST > rangeTime[0]:
-#                            print 'nextTransitTime greater than rangeTime[0]'
                             if nTTPST < rangeTime[1]:
-#                                print 'nextTransitTime less than rangeTime[1]'
-                                d = True;
-#                        print 'd: ', d
-                                    
+                                d = True
 
+# e = sideral_time('apparent',longitude=None,model=None)
+
+                        observing_location = EarthLocation(lat='35.0', lon='299.0', height=500*u.m)  
+
+                        observing_time = Time('2017-12-25 20:12:18')  
+                        
                         if (float(mag) < 11) and d:
                             count = count + 1
-                            
+
+                            aa = AltAz(location=observing_location, obstime=observing_time)
+                            print 'aa: ', aa
+
                             print 'dateTime              : ', dateTime
                             print 'dateTimeUTC           : ', dateTimeUTC
                             print
