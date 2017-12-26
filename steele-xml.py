@@ -16,6 +16,8 @@ from astropy.coordinates import EarthLocation,SkyCoord
 from astropy import units as u
 from astropy.coordinates import AltAz
 
+import cmath
+
 # import subprocess
 
 # subprocess.call ('ls')
@@ -30,6 +32,10 @@ commands.getstatusoutput ('cd xml_files; ln -s ../systems_kepler/*.xml .;cd ..')
 commands.getstatusoutput ('rm xml_files/WISE*.xml')
 commands.getstatusoutput ('rm xml_files/PSO?J318.5-22.xml')
 commands.getstatusoutput ('rm xml_files/CFBDSIR2149.xml')
+commands.getstatusoutput ('rm xml_files/KOI-2700.xml')
+commands.getstatusoutput ('rm xml_files/KIC?12557548.xml')
+commands.getstatusoutput ('rm xml_files/EPIC?204129699.xml')
+commands.getstatusoutput ('rm xml_files/EPIC?201637175.xml')
 
 # This creates a list of all of the files in systems and systems_kepler.
 # If I can get this working in the 'for file' I won't need the silly softlinks
@@ -55,7 +61,7 @@ now         = Time (dateTimeUTC, scale='utc')
 
 # For testing hardcore a date/time range
 
-observingRange = ['2017-12-25T18:00:00','2017-12-25T23:00:00']
+observingRange = ['2017-12-26T18:00:00','2017-12-26T23:00:00']
 rangeTime = Time(observingRange, format='isot', scale='utc')
 
 for file in os.listdir('xml_files'):
@@ -63,7 +69,6 @@ for file in os.listdir('xml_files'):
 # Because of the way I set my the xml_files directory all of the files are xml files
 
     if fnmatch.fnmatch(file, '*.xml'):
-#        print 'file                  : ', file
         
         tree = ET.parse ('xml_files/'+file)
         root = tree.getroot();
@@ -120,6 +125,26 @@ for file in os.listdir('xml_files'):
                         nextTransitTimePST = nextTransit - (1.0/24.0*8.0)
                         nTTPST = Time (nextTransitTimePST, format='jd', scale='utc')
 
+                        starRadius   = star.findtext('radius')
+                        if (starRadius == None):
+                            starRadius = float(0.0)
+                        else:
+                            starRadius    = float(starRadius) * 1.3914 * 1000000
+
+                        planetRadius   = planet.findtext('radius')
+                        
+                        if (planetRadius == None):
+                            planetRadius = 0.0
+                        else:
+                            planetRadius = float(planetRadius) * 139822
+
+                        if (starRadius != 0) and (planetRadius != 0):
+                            starArea = cmath.pi * starRadius * starRadius
+                            planetArea = cmath.pi * planetRadius * planetRadius
+                            planetStarAreaRatio = planetArea / starArea
+                        else:
+                            planetStarAreaRatio = 0
+                            
                         a = nextTransitTimePST
                         b = nowPST.jd + 1
                         c = a < b
@@ -135,12 +160,16 @@ for file in os.listdir('xml_files'):
 
                         observing_time = Time('2017-12-25 20:12:18')  
                         
-                        if (float(mag) < 11) and d:
+                        if (float(mag) < 11) and d and (planetStarAreaRatio >= 0.01):
                             count = count + 1
 
                             aa = AltAz(location=observing_location, obstime=observing_time)
                             print 'aa: ', aa
 
+                            print
+                            print 'file name             : ', file
+                            print
+                            
                             print 'dateTime              : ', dateTime
                             print 'dateTimeUTC           : ', dateTimeUTC
                             print
@@ -168,6 +197,12 @@ for file in os.listdir('xml_files'):
                             print 'nTTPST.jd             : ', nTTPST.jd
                             print 'nTTPST.fits           : ', nTTPST.fits, 'PST'
 
+
+                            print 'Star radius           : ', starRadius
+                            print 'Planet radius         : ', planetRadius
+
+                            print 'Planet/Star area ratio: ', planetStarAreaRatio
+                            
                             print 'count: ', count
                             print
                             
