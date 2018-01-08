@@ -61,7 +61,7 @@ now         = Time (dateTimeUTC, scale='utc')
 
 # For testing hardcore a date/time range
 
-observingRange = ['2017-12-26T18:00:00','2017-12-26T23:00:00']
+observingRange = ['2018-01-01T18:00:00','2018-01-05T23:00:00']
 rangeTime = Time(observingRange, format='isot', scale='utc')
 
 for file in os.listdir('xml_files'):
@@ -77,7 +77,7 @@ for file in os.listdir('xml_files'):
             star = tree.find('.//star')
         except:
             print 'tree.find raised an exception'
-            
+
         for planet in star.findall('.//planet'):
             if planet.findtext ('istransiting') == '1':
 
@@ -105,7 +105,7 @@ for file in os.listdir('xml_files'):
 
                         transitTimeBJD = float(planet.findtext('transittime'))
 
-                        t = Time(transitTimeBJD, format = 'jd', scale='utc')
+                        transitTime = Time(transitTimeBJD, format = 'jd', scale='utc')
 
                         delta  = now.jd - transitTimeBJD;
                 
@@ -156,15 +156,18 @@ for file in os.listdir('xml_files'):
 
 # e = sideral_time('apparent',longitude=None,model=None)
 
-                        observing_location = EarthLocation(lat='35.0', lon='299.0', height=500*u.m)  
+                        observingPosition = EarthLocation(lat='35.0', lon='299.0', height=500*u.m)  
 
-                        observing_time = Time('2017-12-25 20:12:18')  
+                        observingNextTransitTime = Time(nextTransitTime.fits)
                         
                         if (float(mag) < 11) and d and (planetStarAreaRatio >= 0.01):
                             count = count + 1
 
-                            aa = AltAz(location=observing_location, obstime=observing_time)
-                            print 'aa: ', aa
+                            print 'observingPosition     : ', observingPosition
+                            print 'observingNextTransitTime: ', observingNextTransitTime
+                            
+                            aa = AltAz(location=observingPosition, obstime=observingNextTransitTime)
+                            print 'aa    : ', aa
 
                             print
                             print 'file name             : ', file
@@ -182,8 +185,8 @@ for file in os.listdir('xml_files'):
                             print 'Planet period         : ', planet.findtext('period') 
                             print
                             print 'transitTimeBJD        : ', transitTimeBJD
-                            print 't.jd                  : ', t.jd
-                            print 't.fits                : ', t.fits
+                            print 'transitTime.jd        : ', transitTime.jd
+                            print 'transitTime.fits      : ', transitTime.fits
                             print 'now                   : ', now
                             print 'now jd                : ', now.jd
                             print 'now fits              : ', now.fits
