@@ -161,7 +161,7 @@ for file in os.listdir('xml_files'):
 
 # e = sideral_time('apparent',longitude=None,model=None)
 
-                        observingPosition = EarthLocation(lat='35.0', lon='299.0', height=500*u.m)  
+                        observingPosition = EarthLocation(lat=34*u.deg, lon=-118*u.deg, height=500*u.m)  
 
                         observingNextTransitTime = Time(nextTransitTime.fits)
                         
@@ -174,6 +174,18 @@ for file in os.listdir('xml_files'):
                             aa = AltAz(location=observingPosition, obstime=observingNextTransitTime)
                             print ('aa    : ', aa)
 
+                            print ('ra dec:', root.findtext('rightascension')+' '+root.findtext('declination'))
+                            skyCoord = SkyCoord ('05h04m20s -06d13m47s', frame='icrs')
+#                            skyCoord = SkyCoord (root.findtext('rightascension')+' '+root.findtext('declination'), frame='icrs')
+
+                            print (skyCoord)
+                            
+                            altAzi = skyCoord.transform_to(AltAz(obstime=observingNextTransitTime,location=observingPosition))
+
+                            print ('altAzi: ', altAzi)
+                            print (altAzi.az)
+                            print (altAzi.alt)
+                            
                             print ()
                             print ( 'file name             : ', file)
                             print ()
