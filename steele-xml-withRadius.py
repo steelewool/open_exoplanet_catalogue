@@ -64,7 +64,7 @@ now         = Time (dateTimeUTC, scale='utc')
 
 # For testing hardcore a date/time range
 
-observingRange = ['2018-04-24T18:00:00','2018-04-26T23:00:00']
+observingRange = ['2018-05-21T18:00:00','2018-05-22T23:00:00']
 rangeTime = Time(observingRange, format='isot', scale='utc')
 
 for file in os.listdir('xml_files'):
@@ -175,16 +175,26 @@ for file in os.listdir('xml_files'):
                             print ('aa    : ', aa)
 
                             print ('ra dec:', root.findtext('rightascension')+' '+root.findtext('declination'))
-                            skyCoord = SkyCoord ('05h04m20s -06d13m47s', frame='icrs')
-#                            skyCoord = SkyCoord (root.findtext('rightascension')+' '+root.findtext('declination'), frame='icrs')
+                            # skyCoord = SkyCoord ('05h04m20s -06d13m47s', frame='icrs')
 
-                            print (skyCoord)
+                            ra = root.findtext('rightascension')
+                            dec = root.findtext('declination')
+                            
+                            raHrMinSec = ra[0:2] + 'h' + ra[3:5] + 'm' + ra[6:8] + 's'
+                            decDegMinSec = dec[0:3] + 'd' + dec[4:6] + 'm' + dec[8:10] + 's'
+                            
+                            print ('raHrMinSec  : ', raHrMinSec)
+                            print ('decDegMinSec: ', decDegMinSec)
+                            
+                            skyCoord = SkyCoord (raHrMinSec + ' ' + decDegMinSec, frame='icrs')
+
+                            print ('skyCoord: ', skyCoord)
                             
                             altAzi = skyCoord.transform_to(AltAz(obstime=observingNextTransitTime,location=observingPosition))
 
                             print ('altAzi: ', altAzi)
-                            print (altAzi.az)
-                            print (altAzi.alt)
+                            print ('azi   : ', altAzi.az)
+                            print ('alt   : ', altAzi.alt)
                             
                             print ()
                             print ( 'file name             : ', file)
